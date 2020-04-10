@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-
+import axios from 'axios';
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
 import Search from './Search';
+
 
 function Ingredients() {
 
   const [ings, setIngs] = useState([]);
 
   const addIngredientHandler = ingredient => {
-    // add a new ingredient (obj) to existing ingredients array (also add id to that new ingredient)
-    setIngs(prevIngs => [ ...prevIngs, { ...ingredient, id: Math.random().toString() } ] );
-  };
 
-  const removeIngredientHandler = () => {
-
+    axios.post('http://localhost:8000/ingredients/', ingredient)
+      .then(res => {
+      // add a new ingredient (obj) to existing ingredients array (also add id to that ingredient)
+        setIngs(prevIngs => [ ...prevIngs, { ...ingredient, id: res.data.id } ] );
+      });
   };
 
   return (
@@ -22,7 +23,7 @@ function Ingredients() {
       <IngredientForm onAddIngredient={addIngredientHandler} />
       <section>
         <Search />
-        <IngredientList ingredients={ings} onRemoveItem={removeIngredientHandler}
+        <IngredientList ingredients={ings} onRemoveItem={() => {}}
         />
       </section>
     </div>
