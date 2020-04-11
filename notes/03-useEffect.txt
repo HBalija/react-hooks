@@ -43,3 +43,15 @@ USE EFFECT DEPENDENCIES
 
     // this will run only if ings change
   }, [ings]);
+
+- we can also destruct props to use specific prop in dependency array
+
+
+
+const {someProp, otherProp} = props
+
+  useEffect(() => {
+    console.log('RENDERING INGREDIENTS', ings); // eslint-disable-line no-console
+
+    // this will run only if ings change
+  }, [someProp]);

@@ -14,7 +14,7 @@ const Search = React.memo(props => {
   useEffect(() => {
     axios.get(url)
       .then(res => {
-        // onLoadIngredients(res.data);
+        onLoadIngredients(res.data);
       });
   }, [titleFilter, onLoadIngredients]);
 

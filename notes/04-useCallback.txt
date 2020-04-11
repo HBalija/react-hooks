@@ -1,0 +1,34 @@
+useCallback()
+
+--> continue on useEffect:
+in search js we get an infinite loop because of onLoadIngredients dependency
+- ingredient.js gets rerendered
+
+SOLUTION: useCallback hook
+
+- allow us to wrap a function with it
+
+1st argument is wrapping function
+2nd argument is an array with dependencies for that function
+
+in our case, in ingredients.js
+
+  const filteredIngredientsHandler = filteredIngs => {
+    setFilteredIngs(filteredIngs);
+  };
+
+- this function affects "onLoadIngredients" in search.js
+
+we wrap it with useCallback
+
+
+- we have no dependencies in filteredIngredientsHandler because setFilteredIngs is from component state
+
+so we write it like this:
+
+
+  const filteredIngredientsHandler = useCallback(filteredIngs => {
+    setFilteredIngs(filteredIngs);
+  }, []);
+
+  ---> it caches this function for use, will not rerun it on render, it is not effected on props / state change, will not trigger rerendering

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import IngredientForm from './IngredientForm';
 import IngredientList from './IngredientList';
@@ -12,12 +12,17 @@ function Ingredients() {
 
   const url = 'http://localhost:8000/ingredients/';
 
-  useEffect(() => {
-    axios.get(url)
-      .then(res => {
-        setIngs(res.data);
-      });
-  }, []);
+  /*
+  we don't need this code if we fetch ingredients in search
+  - not ideal
+  - would be better to fetch it here and then filter it directly
+  */
+  // useEffect(() => {
+  //   axios.get(url)
+  //     .then(res => {
+  //       setIngs(res.data);
+  //     });
+  // }, []);
 
   useEffect(() => {
     console.log('RENDERING INGREDIENTS', ings); // eslint-disable-line no-console
@@ -25,9 +30,9 @@ function Ingredients() {
     // this will run only if ings change
   }, [ings]);
 
-  const filteredIngredientsHandler = filteredIngs => {
+  const filteredIngredientsHandler = useCallback(filteredIngs => {
     setFilteredIngs(filteredIngs);
-  };
+  }, []);
 
   const addIngredientHandler = ingredient => {
     axios.post(url, ingredient)
