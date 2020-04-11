@@ -1,0 +1,45 @@
+useEffect
+
+- manages side effects like fetching data from http
+- we can have multiple useEffect calls
+
+- gets executed after every component render cycle
+- important: for every render cycle it gets executed (after it)
+
+takes a function as an argument
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/ingredients/')
+      .then(res => {
+        setIngs(res.data);
+      });
+  });
+
+  --> used like this, it acts like componentDidUpdate (it rerenders)
+
+------------------------------------------------------------------------------------
+
+  - ADDING SECOND ARGUMENT TO USE EFFECt: dependency list
+
+
+  ---------------------------------------------------------------------------------------
+
+- if we add [] as a second argument, it will act as componendDidMount: will not trigger rerender
+- will run only once
+
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/ingredients/')
+      .then(res => {
+        setIngs(res.data);
+      });
+  }, []);
+
+
+USE EFFECT DEPENDENCIES
+
+  useEffect(() => {
+    console.log('RENDERING INGREDIENTS', ings); // eslint-disable-line no-console
+
+    // this will run only if ings change
+  }, [ings]);
