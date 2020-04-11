@@ -8,6 +8,7 @@ import Search from './Search';
 function Ingredients() {
 
   const [ings, setIngs] = useState([]);
+  const [filteredIngs, setFilteredIngs] = useState(ings);
 
   const url = 'http://localhost:8000/ingredients/';
 
@@ -24,6 +25,10 @@ function Ingredients() {
     // this will run only if ings change
   }, [ings]);
 
+  const filteredIngredientsHandler = filteredIngs => {
+    setFilteredIngs(filteredIngs);
+  };
+
   const addIngredientHandler = ingredient => {
     axios.post(url, ingredient)
       .then(res => {
@@ -36,8 +41,8 @@ function Ingredients() {
     <div className="App">
       <IngredientForm onAddIngredient={addIngredientHandler} />
       <section>
-        <Search />
-        <IngredientList ingredients={ings} onRemoveItem={() => {}}
+        <Search onLoadIngredients={filteredIngredientsHandler} ingredients={ings} />
+        <IngredientList ingredients={filteredIngs} onRemoveItem={() => {}}
         />
       </section>
     </div>
