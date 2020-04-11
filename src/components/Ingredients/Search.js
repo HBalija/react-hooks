@@ -13,15 +13,20 @@ const Search = React.memo(props => {
   const url = `http://localhost:8000/ingredients/?title=${titleFilter}`;
 
   useEffect(() => {
-    setTimeout(() => {
+
+    const timer = setTimeout(() => {
       if (titleFilter === inputRef.current.value) {
         axios.get(url)
           .then(res => {
             onLoadIngredients(res.data);
           });
       }
-
     }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+
   }, [titleFilter, onLoadIngredients, inputRef]);
 
   return (

@@ -75,3 +75,11 @@ our code now:
 
 
 --> this makes a delay for our requests, only one is sent after we stop typing for 500 ms
+
+
+
+THIS IS NOT IDEAL:
+
+- we want to make sure we clear the previous timer before setting up a new timer.
+
+- use useEffect for that

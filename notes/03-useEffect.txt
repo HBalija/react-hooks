@@ -55,3 +55,56 @@ const {someProp, otherProp} = props
 
     // this will run only if ings change
   }, [someProp]);
+
+
+
+CLEANING UP USE EFFECT
+
+- starting code:
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (titleFilter === inputRef.current.value) {
+        axios.get(url)
+          .then(res => {
+            onLoadIngredients(res.data);
+          });
+      }
+    }, 500);
+  }, [titleFilter, onLoadIngredients, inputRef]);
+
+
+  - problem: we set new timers on every keystroke without clearing previous ones
+
+- setTimeout() returns a reference to the function
+
+useEffect can return a function wich will act like componentWillUnmount
+
+- that function will run before body in useEffect
+--> cleanup will run for previous effect before new effect is applied
+
+
+--> new code with cleanup in place
+--> WE NEED TO RETURN A FUNCTION DEFINITION!!!
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+      if (titleFilter === inputRef.current.value) {
+        axios.get(url)
+          .then(res => {
+            onLoadIngredients(res.data);
+          });
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+
+  }, [titleFilter, onLoadIngredients, inputRef]);
+
+
+WHEN TO USE:
+
+- when we make new stuff in useEffect
