@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
 import ErrorModal from '../UI/ErrorModal';
@@ -47,7 +47,7 @@ function Ingredients() {
     dispatch({ type: 'SET', ingredients: filteredIngs });
   }, []);
 
-  const addIngredientHandler = ingredient => {
+  const addIngredientHandler = useCallback(ingredient => {
     httpDispatch({ type: 'SEND' });
     axios.post(url, ingredient)
       .then(res => {
@@ -55,9 +55,9 @@ function Ingredients() {
         dispatch({ type: 'ADD', ingredient: { ...ingredient, id: res.data.id } });
         httpDispatch({ type: 'RESPONSE' });
       });
-  };
+  }, []);
 
-  const removeIngredienthandler = id => {
+  const removeIngredienthandler = useCallback(id => {
     httpDispatch({ type: 'SEND' });
     axios.delete(url + `${id}/`)
       .then(() => {
@@ -66,11 +66,17 @@ function Ingredients() {
       }).catch(err => {
         httpDispatch({ type: 'ERROR', error: err.message });
       });
-  };
+  }, []);
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     httpDispatch({ type: 'CLEAR_ERROR' });
-  };
+  }, []);
+
+  const ingredientList = useMemo(() => {
+    return (
+      <IngredientList ingredients={ingredientState} onRemoveItem={removeIngredienthandler} />
+    );
+  }, [ingredientState, removeIngredienthandler]);
 
   return (
     <div className="App">
@@ -78,8 +84,7 @@ function Ingredients() {
       <IngredientForm onAddIngredient={addIngredientHandler} loading={httpState.isLoading} />
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
-        <IngredientList ingredients={ingredientState} onRemoveItem={removeIngredienthandler}
-        />
+        {ingredientList}
       </section>
     </div>
   );
