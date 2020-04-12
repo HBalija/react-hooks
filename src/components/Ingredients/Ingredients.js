@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useReducer, useCallback } from 'react';
 import axios from 'axios';
 
 import ErrorModal from '../UI/ErrorModal';
@@ -7,59 +7,78 @@ import IngredientList from './IngredientList';
 import Search from './Search';
 
 
+const ingredientReducer = (state, action) => {
+  switch (action.type) {
+  case 'SET':
+    return action.ingredients;
+  case 'ADD':
+    return [ ...state, action.ingredient ];
+  case 'DELETE':
+    return state.filter(ing => ing.id !== action.id);
+  default:
+    return state;
+  }
+};
+
+const httpReducer = (state, action) => {
+  switch (action.type) {
+  case 'SEND':
+    return { ...state, isLoading: true };
+  case 'RESPONSE':
+    return { ...state, isLoading: false };
+  case 'ERROR':
+    return { isLoading: false, error: action.error };
+  case 'CLEAR_ERROR':
+    return { ...state, error: false };
+  default:
+    return state;
+  }
+};
+
+
 function Ingredients() {
 
-  const [ings, setIngs] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [ingredientState, dispatch] = useReducer(ingredientReducer, []);
+  const [httpState, httpDispatch] = useReducer(httpReducer, { isLoading: false, error: null });
 
   const url = 'http://localhost:8000/ingredients/';
 
-  useEffect(() => {
-    console.log('RENDERING INGREDIENTS', ings); // eslint-disable-line no-console
-
-    // this will run only if ings change
-  }, [ings]);
-
   const filteredIngredientsHandler = useCallback(filteredIngs => {
-    setIngs(filteredIngs);
+    dispatch({ type: 'SET', ingredients: filteredIngs });
   }, []);
 
   const addIngredientHandler = ingredient => {
-    setIsLoading(true);
+    httpDispatch({ type: 'SEND' });
     axios.post(url, ingredient)
       .then(res => {
       // add a new ingredient (obj) to existing ingredients array (also add id to that ingredient)
-        setIngs(prevIngs => [ ...prevIngs, { ...ingredient, id: res.data.id } ] );
-        setIsLoading(false);
+        dispatch({ type: 'ADD', ingredient: { ...ingredient, id: res.data.id } });
+        httpDispatch({ type: 'RESPONSE' });
       });
   };
 
-  const RemoveIngredienthandler = id => {
-    setIsLoading(true);
+  const removeIngredienthandler = id => {
+    httpDispatch({ type: 'SEND' });
     axios.delete(url + `${id}/`)
       .then(() => {
-        // return a new list of ingredients without the one that matches id
-        setIngs(prevIngredients => prevIngredients.filter(ing => ing.id !== id));
-        setIsLoading(false);
+        dispatch({ type: 'DELETE', id });
+        httpDispatch({ type: 'RESPONSE' });
       }).catch(err => {
-        // react batches state change functions into a single call (component gets rerendered once)
-        setError(err.message);
-        setIsLoading(false);
+        httpDispatch({ type: 'ERROR', error: err.message });
       });
   };
 
   const clearError = () => {
-    setError(null);
+    httpDispatch({ type: 'CLEAR_ERROR' });
   };
 
   return (
     <div className="App">
-      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal> }
-      <IngredientForm onAddIngredient={addIngredientHandler} loading={isLoading} />
+      {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal> }
+      <IngredientForm onAddIngredient={addIngredientHandler} loading={httpState.isLoading} />
       <section>
-        <Search onLoadIngredients={filteredIngredientsHandler} ingredients={ings} />
-        <IngredientList ingredients={ings} onRemoveItem={RemoveIngredienthandler}
+        <Search onLoadIngredients={filteredIngredientsHandler} />
+        <IngredientList ingredients={ingredientState} onRemoveItem={removeIngredienthandler}
         />
       </section>
     </div>

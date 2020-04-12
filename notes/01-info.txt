@@ -1,5 +1,0 @@
-REACT HOOKS
-
-JavaScript function which can be only used inside Functional components or other hooks
-
-They are named: useXYZ()

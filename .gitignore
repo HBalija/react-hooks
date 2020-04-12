@@ -5,6 +5,8 @@ __pycache__
 html_cov/
 .vscode/
 
+notes/
+
 
 # dependencies
 /node_modules
